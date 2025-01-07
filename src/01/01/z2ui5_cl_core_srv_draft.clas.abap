@@ -83,16 +83,16 @@ CLASS z2ui5_cl_core_srv_draft IMPLEMENTATION.
 
     IF check_load_app = abap_true.
 
-      SELECT SINGLE * FROM z2ui5_t_01
+      SELECT SINGLE * FROM z2ui5_t_01 INTO result
         WHERE id = id
-        INTO result ##SUBRC_OK.
+         ##SUBRC_OK.
 
     ELSE.
 
       SELECT SINGLE id id_prev id_prev_app id_prev_app_stack
-        FROM z2ui5_t_01
+        FROM z2ui5_t_01 INTO CORRESPONDING FIELDS OF result
         WHERE id = id
-        INTO CORRESPONDING FIELDS OF result ##SUBRC_OK.
+         ##SUBRC_OK.
 
     ENDIF.
 

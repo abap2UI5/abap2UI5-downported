@@ -55,7 +55,7 @@ CLASS lcl_range_to_sql IMPLEMENTATION.
 
     FIELD-SYMBOLS <lt_range> TYPE STANDARD TABLE.
     DATA temp1 TYPE xsdboolean.
-    FIELD-SYMBOLS <ls_range_item> LIKE LINE OF <lt_range>.
+    FIELD-SYMBOLS <ls_range_item> TYPE ANY.
       FIELD-SYMBOLS <lv_sign> TYPE any.
       FIELD-SYMBOLS <lv_option> TYPE any.
       FIELD-SYMBOLS <lv_low> TYPE any.
@@ -156,7 +156,7 @@ CLASS lcl_msp_mapper IMPLEMENTATION.
 
     DATA lv_kind TYPE string.
         FIELD-SYMBOLS <tab> TYPE ANY TABLE.
-        FIELD-SYMBOLS <row> LIKE LINE OF <tab>.
+        FIELD-SYMBOLS <row> TYPE ANY.
           DATA lt_tab TYPE z2ui5_cl_util=>ty_t_msg.
         DATA lt_attri TYPE abap_component_tab.
         DATA temp54 TYPE z2ui5_cl_util=>ty_s_msg.
