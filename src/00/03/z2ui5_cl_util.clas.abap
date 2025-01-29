@@ -450,8 +450,6 @@ CLASS z2ui5_cl_util DEFINITION
       RETURNING
         VALUE(result) TYPE string.
 
-    CLASS-METHODS check_raise_srtti_installed.
-
     CLASS-METHODS rtti_check_clike
       IMPORTING
         val           TYPE any
@@ -1588,8 +1586,6 @@ DATA lt_param TYPE temp3.
 
   METHOD xml_srtti_parse.
 
-*    check_raise_srtti_installed( ).
-
     DATA srtti TYPE REF TO object.
     DATA rtti_type TYPE REF TO cl_abap_typedescr.
     DATA lo_datadescr TYPE REF TO cl_abap_datadescr.
@@ -1612,19 +1608,11 @@ DATA lt_param TYPE temp3.
   ENDMETHOD.
 
   METHOD xml_srtti_stringify.
-        DATA lv_check_srtti_installed LIKE abap_true.
       DATA srtti TYPE REF TO object.
       DATA lv_classname TYPE string.
+      DATA lv_text TYPE string.
 
-    TRY.
-        
-        lv_check_srtti_installed = abap_true.
-        check_raise_srtti_installed( ).
-      CATCH cx_root.
-        lv_check_srtti_installed = abap_false.
-    ENDTRY.
-
-    IF lv_check_srtti_installed = abap_true.
+    IF rtti_check_class_exists( 'ZCL_SRTTI_TYPEDESCR' ) = abap_true.
 
       
       
@@ -1637,7 +1625,7 @@ DATA lt_param TYPE temp3.
 
       CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
 
-    ELSE.
+    ELSEIF rtti_check_class_exists( 'Z2UI5_CL_SRTTI_TYPEDESCR' ) = abap_true..
 
       "DATA srtti TYPE REF TO object.
       lv_classname = 'Z2UI5_CL_SRTTI_TYPEDESCR'.
@@ -1649,7 +1637,12 @@ DATA lt_param TYPE temp3.
 
       CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
 
-
+    ELSE.
+      
+      lv_text = `UNSUPPORTED_FEATURE - Please install the open-source project S-RTTI by sandraros and try again: https://github.com/sandraros/S-RTTI`.
+      RAISE EXCEPTION TYPE z2ui5_cx_util_error
+        EXPORTING
+          val = lv_text.
     ENDIF.
 
   ENDMETHOD.
@@ -1699,20 +1692,6 @@ DATA lt_param TYPE temp3.
 
   ENDMETHOD.
 
-  METHOD check_raise_srtti_installed.
-      DATA lv_text TYPE string.
-
-    IF rtti_check_class_exists( 'ZCL_SRTTI_TYPEDESCR' ) = abap_false.
-
-      
-      lv_text = `UNSUPPORTED_FEATURE - Please install the open-source project S-RTTI by sandraros and try again: https://github.com/sandraros/S-RTTI`.
-      RAISE EXCEPTION TYPE z2ui5_cx_util_error
-        EXPORTING
-          val = lv_text.
-
-    ENDIF.
-
-  ENDMETHOD.
 
   METHOD rtti_get_t_attri_by_table_name.
         DATA lo_obj TYPE REF TO cl_abap_typedescr.
