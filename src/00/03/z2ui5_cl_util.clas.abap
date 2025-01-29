@@ -1587,14 +1587,13 @@ DATA lt_param TYPE temp3.
   ENDMETHOD.
 
   METHOD xml_srtti_parse.
+
+*    check_raise_srtti_installed( ).
+
     DATA srtti TYPE REF TO object.
     DATA rtti_type TYPE REF TO cl_abap_typedescr.
     DATA lo_datadescr TYPE REF TO cl_abap_datadescr.
     FIELD-SYMBOLS <variable> TYPE data.
-
-    check_raise_srtti_installed( ).
-
-    
     CALL TRANSFORMATION id SOURCE XML rtti_data RESULT srtti = srtti.
 
     
@@ -1613,21 +1612,45 @@ DATA lt_param TYPE temp3.
   ENDMETHOD.
 
   METHOD xml_srtti_stringify.
-    DATA srtti TYPE REF TO object.
-    DATA lv_classname TYPE c LENGTH 19.
+        DATA lv_check_srtti_installed LIKE abap_true.
+      DATA srtti TYPE REF TO object.
+      DATA lv_classname TYPE string.
 
-    check_raise_srtti_installed( ).
+    TRY.
+        
+        lv_check_srtti_installed = abap_true.
+        check_raise_srtti_installed( ).
+      CATCH cx_root.
+        lv_check_srtti_installed = abap_false.
+    ENDTRY.
 
-    
-    
-    lv_classname = 'ZCL_SRTTI_TYPEDESCR'.
-    CALL METHOD (lv_classname)=>('CREATE_BY_DATA_OBJECT')
-      EXPORTING
-        data_object = data
-      RECEIVING
-        srtti       = srtti.
+    IF lv_check_srtti_installed = abap_true.
 
-    CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
+      
+      
+      lv_classname = `ZCL_SRTTI_TYPEDESCR`.
+      CALL METHOD (lv_classname)=>('CREATE_BY_DATA_OBJECT')
+        EXPORTING
+          data_object = data
+        RECEIVING
+          srtti       = srtti.
+
+      CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
+
+    ELSE.
+
+      "DATA srtti TYPE REF TO object.
+      lv_classname = 'Z2UI5_CL_SRTTI_TYPEDESCR'.
+      CALL METHOD (lv_classname)=>('CREATE_BY_DATA_OBJECT')
+        EXPORTING
+          data_object = data
+        RECEIVING
+          srtti       = srtti.
+
+      CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
+
+
+    ENDIF.
 
   ENDMETHOD.
 
