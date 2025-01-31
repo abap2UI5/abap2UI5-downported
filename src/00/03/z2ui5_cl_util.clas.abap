@@ -71,7 +71,7 @@ CLASS z2ui5_cl_util DEFINITION
         v4         TYPE string,
         timestampl TYPE timestampl,
       END OF ty_s_msg,
-      ty_t_msg TYPE STANDARD TABLE OF ty_S_msg WITH DEFAULT KEY.
+      ty_t_msg TYPE STANDARD TABLE OF ty_s_msg WITH DEFAULT KEY.
 
     CLASS-METHODS ui5_get_msg_type
       IMPORTING
@@ -1610,7 +1610,7 @@ DATA lt_param TYPE temp3.
   METHOD xml_srtti_stringify.
       DATA srtti TYPE REF TO object.
       DATA lv_classname TYPE string.
-      DATA lv_text TYPE string.
+          DATA lv_text TYPE string.
 
     IF rtti_check_class_exists( 'ZCL_SRTTI_TYPEDESCR' ) = abap_true.
 
@@ -1625,24 +1625,27 @@ DATA lt_param TYPE temp3.
 
       CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
 
-    ELSEIF rtti_check_class_exists( 'Z2UI5_CL_SRTTI_TYPEDESCR' ) = abap_true..
+    ELSE.
 
-      "DATA srtti TYPE REF TO object.
-      lv_classname = 'Z2UI5_CL_SRTTI_TYPEDESCR'.
-      CALL METHOD (lv_classname)=>('CREATE_BY_DATA_OBJECT')
+      TRY.
+          CALL METHOD z2ui5_cl_srt_typedescr=>('CREATE_BY_DATA_OBJECT')
         EXPORTING
           data_object = data
         RECEIVING
           srtti       = srtti.
 
-      CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
+          CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
 
-    ELSE.
-      
-      lv_text = `UNSUPPORTED_FEATURE - Please install the open-source project S-RTTI by sandraros and try again: https://github.com/sandraros/S-RTTI`.
-      RAISE EXCEPTION TYPE z2ui5_cx_util_error
-        EXPORTING
-          val = lv_text.
+        CATCH cx_root.
+
+          
+          lv_text = `UNSUPPORTED_FEATURE - Please install the open-source project S-RTTI by sandraros and try again: https://github.com/sandraros/S-RTTI`.
+          RAISE EXCEPTION TYPE z2ui5_cx_util_error
+            EXPORTING
+              val = lv_text.
+    
+      ENDTRY.
+    
     ENDIF.
 
   ENDMETHOD.
