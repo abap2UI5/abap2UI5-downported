@@ -1643,9 +1643,9 @@ DATA lt_param TYPE temp3.
           RAISE EXCEPTION TYPE z2ui5_cx_util_error
             EXPORTING
               val = lv_text.
-    
+
       ENDTRY.
-    
+
     ENDIF.
 
   ENDMETHOD.
