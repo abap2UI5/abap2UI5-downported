@@ -1,6 +1,6 @@
 CLASS z2ui5_cl_util DEFINITION
   PUBLIC
-  INHERITING FROM z2ui5_cl_abap_api
+  INHERITING FROM z2ui5_cl_util_abap
   CREATE PUBLIC.
 
   PUBLIC SECTION.
@@ -96,7 +96,7 @@ CLASS z2ui5_cl_util DEFINITION
         rollname      TYPE clike
         langu         TYPE clike DEFAULT sy-langu
       RETURNING
-        VALUE(result) TYPE z2ui5_cl_abap_api=>ty_t_fix_val ##NEEDED.
+        VALUE(result) TYPE z2ui5_cl_util_abap=>ty_t_fix_val ##NEEDED.
 
     CLASS-METHODS source_get_method2
       IMPORTING
@@ -964,7 +964,8 @@ DATA lt_cols TYPE temp2.
       DATA lv_name TYPE string.
       DATA temp18 TYPE abap_componentdescr.
     DATA struc TYPE REF TO cl_abap_structdescr.
-    DATA temp19 TYPE REF TO cl_abap_typedescr.
+    DATA temp19 TYPE REF TO cl_abap_datadescr.
+    DATA data LIKE temp19.
     DATA o_table_desc TYPE REF TO cl_abap_tabledescr.
     DATA temp20 LIKE LINE OF lt_rows.
     DATA lr_rows LIKE REF TO temp20.
@@ -1003,7 +1004,9 @@ DATA lt_cols TYPE temp2.
     
     temp19 ?= struc.
     
-    o_table_desc = cl_abap_tabledescr=>create( p_line_type  = temp19
+    data = temp19.
+    
+    o_table_desc = cl_abap_tabledescr=>create( p_line_type  = data
                                                      p_table_kind = cl_abap_tabledescr=>tablekind_std
                                                      p_unique     = abap_false ).
 
@@ -1629,10 +1632,10 @@ DATA lt_param TYPE temp3.
 
       TRY.
           CALL METHOD z2ui5_cl_srt_typedescr=>('CREATE_BY_DATA_OBJECT')
-        EXPORTING
-          data_object = data
-        RECEIVING
-          srtti       = srtti.
+            EXPORTING
+              data_object = data
+            RECEIVING
+              srtti       = srtti.
 
           CALL TRANSFORMATION id SOURCE srtti = srtti dobj = data RESULT XML result.
 
@@ -1807,16 +1810,14 @@ DATA lt_param TYPE temp3.
   METHOD filter_get_sql_where.
 
     DATA ls_filter LIKE LINE OF val.
-      DATA lo_range TYPE REF TO lcl_range_to_sql.
       DATA temp52 LIKE REF TO ls_filter-t_range.
+DATA lo_range TYPE REF TO z2ui5_cl_util_range.
     LOOP AT val INTO ls_filter.
-
-      " TODO: variable is assigned but never used (ABAP cleaner)
-      
 
       
       GET REFERENCE OF ls_filter-t_range INTO temp52.
-CREATE OBJECT lo_range EXPORTING iv_fieldname = ls_filter-name ir_range = temp52.
+
+CREATE OBJECT lo_range TYPE z2ui5_cl_util_range EXPORTING iv_fieldname = ls_filter-name ir_range = temp52.
 
     ENDLOOP.
 
@@ -1824,7 +1825,7 @@ CREATE OBJECT lo_range EXPORTING iv_fieldname = ls_filter-name ir_range = temp52
 
   METHOD msg_get.
 
-    result = lcl_msp_mapper=>msg_get( val ).
+    result = z2ui5_cl_util_msg=>msg_get( val ).
 
   ENDMETHOD.
 
